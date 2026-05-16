@@ -1,6 +1,6 @@
 #include <stdio.h>
 int main(){
-    int bucketcapacity,leakRate,numberofpacket,remaining=0;
+    int bucketcapacity,leakRate,numberofpacket,bucket=0;
     printf("Enter the number of packets : ");
     scanf("%d",&numberofpacket);
     printf("Enter the bucket capacity : ");
@@ -29,7 +29,7 @@ int main(){
         if(bucket>leakRate)
             leaked=leakRate;
         else
-            leaked=bucket
+            leaked=bucket;
         printf("%d\t",leaked);
         bucket -= leaked;
         printf("%d\n",bucket);
@@ -40,10 +40,9 @@ int main(){
         if(bucket>leakRate)
             leaked=leakRate;
         else
-            leaked=bucket
+            leaked=bucket;
+        printf("%d\t0\t%d\t\t%d\t%d\n",time,bucket,leaked,bucket-leaked);
         bucket -= leaked;
-        printf("%d\t0\t%d\t\t%d\t%d",time,bucket,leaked,bucket);
         time ++;
     }
-    
 }
