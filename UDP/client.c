@@ -10,8 +10,8 @@
 int main(){
     int clientSocket;
     struct sockaddr_in serverAddress;
-    socklen_t clientLength = sizeof(cilentAddress);
-    char buffe[SIZE];
+    socklen_t clientLength = sizeof(serverAddress);
+    char buffer[SIZE];
 
     printf("============UDP CLIENT=============\n");
     //socket creation
@@ -24,14 +24,14 @@ int main(){
 
     while(1){
         printf("Client : ");
-        gets(buffer);
+        fgets(buffer,sizeof(buffer),stdin);
         sendto(clientSocket,
             buffer,
             sizeof(buffer),
             0,
             (struct sockaddr*)&serverAddress,
             clientLength); //send inu &illa
-        if(strcmp(buffer,"exit")==0){
+        if(strncmp(buffer,"exit",4)==0){
             printf("[Exit] : connection closing.\n");
             break;
         }
@@ -43,7 +43,7 @@ int main(){
                                 &clientLength); //recvfrom inu & ondu
         buffer[bytesRecived] = '\0';
         printf("Server : %s",buffer);
-        if(strcmp(bufffer,"exit")==0){
+        if(strncmp(buffer,"exit",4)==0){
             printf("[Exit] : connection closing.");
             break;
         }

@@ -8,25 +8,25 @@
 #define SIZE 1024
 
 int main(){
-    int serverAddress;
+    int serverSocket;
     struct sockaddr_in serverAddress;
     socklen_t serverLength = sizeof(serverAddress);
     char buffer[SIZE];
 
     printf("=============UDP server===========\n");
-    //socket creation 
+    //socket creation
     serverSocket = socket(AF_INET,SOCK_DGRAM,0);
 
-    //configure the server with ip+port 
+    //configure the server with ip+port
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(PORT);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     
-    //bind the socket to get server address
+    //bind the socket to the specified ip and port
     bind(serverSocket,
         (struct sockaddr*)&serverAddress,
         sizeof(serverAddress));
-
+    printf("UDP server is running...\n");
     //realtime loop
     while(1){
         int bytesRecived = recvfrom(serverSocket,
@@ -37,19 +37,19 @@ int main(){
                                 &serverLength); // recvfrom inu & veenam 
         buffer[bytesRecived] = '\0';
         printf ("Client : %s",buffer);
-        if(strcmp(buffer,"exit")==0){
+        if(strncmp(buffer,"exit",4)==0){
             printf("[Exit] : connection closing.\n");
             break;
         }
         printf("Server : ");
-        gets(buffer);
+        fgets(buffer, sizeof(buffer), stdin);
         sendto(serverSocket,
             buffer,
             sizeof(buffer),
             0,
             (struct sockaddr*)&serverAddress,
             serverLength);
-        if(strcmp(buffer,"exit")==0){
+        if(strncmp(buffer,"exit",4)==0){
             printf("[Exit] : connection closing.\n");
             break;
         }

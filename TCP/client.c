@@ -37,16 +37,16 @@ int main()
     // realtime chat simulation
     while(1){
         printf("Client : ");
-        gets(buffer); // read i/p from user (keyboard)
+        fgets(buffer,sizeof(buffer),stdin); // read i/p from user (keyboard)
         send(clientSocket,buffer,sizeof(buffer),0); // send message to server
-        if(strcmp(buffer,"exit")==0){
+        if(strncmp(buffer,"exit",4)==0){
             printf("[exit] closing connection...\n");
             break;
         }
         int readBytes = read(clientSocket,buffer,sizeof(buffer)); // read message from server
         buffer[readBytes] = '\0';
         printf("Server : %s",buffer);
-        if(strcmp(buffer,"exit")==0){
+        if(strncmp(buffer,"exit",4)==0){
             printf("[exit] closing connection...\n");
             break;
         }
