@@ -45,7 +45,7 @@ int main()
     //accept incomming connection
     printf("waiting for incoming connections...\n");
     clientSocket = accept(serverSocket,
-                        (struct sockaddr*)&serverAddress,
+                        (struct sockaddr*)&clientAddress,
                         &clientLength);
     //real time chat loop 
     while(1){

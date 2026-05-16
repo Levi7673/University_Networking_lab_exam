@@ -38,7 +38,7 @@ int main()
     while(1){
         printf("Client : ");
         fgets(buffer,sizeof(buffer),stdin); // read i/p from user (keyboard)
-        send(clientSocket,buffer,sizeof(buffer),0); // send message to server
+        send(clientSocket,buffer,strlen(buffer),0); // send message to server
         if(strncmp(buffer,"exit",4)==0){
             printf("[exit] closing connection...\n");
             break;
