@@ -31,7 +31,7 @@ int main(){
         sizeof(serverAddress))<0){
             perror("connection failed.\n");
         }
-    printf("connected to the server.");
+    printf("connected to the server.\n");
     printf("Enter the file name : ");
     scanf("%s",filename);
     
@@ -40,9 +40,9 @@ int main(){
         strlen(filename),
         0);
     
-    while(readBytes = read(clientSocket ,
+    while((readBytes = read(clientSocket ,
                             buffer,
-                            sizeof(buffer))>0){
+                            sizeof(buffer)))>0){
                                 fwrite(buffer,
                                     1,
                                     readBytes,  

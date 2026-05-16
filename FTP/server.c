@@ -9,11 +9,12 @@
 
 int main(){
     int clientSocket,serverSocket;
-    struct sockaddr_in serverAddress , clientSocket;
+    struct sockaddr_in serverAddress , clientAddress;
     socklen_t clientLength = sizeof(clientAddress);
     char filename[SIZE];
     char buffer[SIZE];
-      
+    FILE *filepointer;
+    int readBytes;
     //socket creation 
     serverSocket = socket(AF_INET , SOCK_STREAM , 0 );
     if(serverSocket < 0){
@@ -60,18 +61,20 @@ int main(){
         send(clientSocket,
             buffer,
             strlen(buffer),
-            0)
+            0);
     }else {
-        while(readBytes=fread(buffer,
+        while((readBytes=fread(buffer,
                             1,
                             sizeof(buffer),
-                            filepointer)>0){
+                            filepointer))>0){
                         send(clientSocket,
                             buffer,
                             readBytes,
                             0);
                         }
-        close(filepointer)
+        fclose(filepointer);
     }
+    close(clientSocket);
+    close(serverSocket);
     return 0;
 }
