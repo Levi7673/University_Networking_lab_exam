@@ -6,49 +6,75 @@
 
 #define PORT 8080
 #define SIZE 1024
+
 int main(){
+
     int clientSocket;
+    int readBytes;
+
     struct sockaddr_in serverAddress;
+
     char filename[SIZE];
     char buffer[SIZE];
-    int readBytes ;
 
-    //socket creation 
-    clientSocket = socket(AF_INET,SOCK_STREAM,0);
-    if (clientSocket<0){
-        perror("socket creation failed.\n");
-        exit(1);//exit with failure;
+    printf("\n===========FTP CLIENT===========\n");
+
+    // socket creation
+    clientSocket = socket(AF_INET ,
+                          SOCK_STREAM ,
+                          0);
+
+    if(clientSocket < 0){
+
+        perror("socket creation failed");
+        exit(1);
     }
 
-    // configure the server 
+    // configure server
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(PORT);
-    serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddress.sin_addr.s_addr =
+                    inet_addr("127.0.0.1");
 
-    //establish connection to server 
-    if(connect(clientSocket,
-        (struct sockaddr*)&serverAddress,
-        sizeof(serverAddress))<0){
-            perror("connection failed.\n");
-        }
+    // connect to server
+    if(connect(clientSocket ,
+        (struct sockaddr*)&serverAddress ,
+        sizeof(serverAddress)) < 0){
+
+        perror("connection failed");
+        exit(1);
+    }
+
     printf("connected to the server.\n");
+
+    // read filename from user
     printf("Enter the file name : ");
     scanf("%s",filename);
-    
+
+    // send filename
     send(clientSocket ,
-        filename,
-        strlen(filename),
-        0);
-    
-    while((readBytes = read(clientSocket ,
-                            buffer,
-                            sizeof(buffer)))>0){
-                                fwrite(buffer,
-                                    1,
-                                    readBytes,  
-                                    stdout);
-                            }
-    printf("File transfer complete.\n");
+         filename ,
+         strlen(filename) ,
+         0);
+
+    printf("\n===========FILE CONTENT===========\n\n");
+
+    // receive file content
+    while((readBytes =
+            read(clientSocket ,
+                 buffer ,
+                 sizeof(buffer))) > 0){
+
+        fwrite(buffer ,
+               1 ,
+               readBytes ,
+               stdout);
+    }
+
+    printf("\n\n[file transfer complete]\n");
+
+    // close socket
     close(clientSocket);
+
     return 0;
 }

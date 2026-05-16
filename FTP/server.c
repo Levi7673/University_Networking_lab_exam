@@ -8,73 +8,115 @@
 #define SIZE 1024
 
 int main(){
-    int clientSocket,serverSocket;
-    struct sockaddr_in serverAddress , clientAddress;
-    socklen_t clientLength = sizeof(clientAddress);
+
+    int clientSocket , serverSocket;
+    int readBytes;
+
+    struct sockaddr_in serverAddress ,
+                        clientAddress;
+
+    socklen_t clientLength =
+                    sizeof(clientAddress);
+
     char filename[SIZE];
     char buffer[SIZE];
+
     FILE *filepointer;
-    int readBytes;
-    //socket creation 
-    serverSocket = socket(AF_INET , SOCK_STREAM , 0 );
+
+    printf("\n===========FTP SERVER===========\n");
+
+    // socket creation
+    serverSocket = socket(AF_INET ,
+                          SOCK_STREAM ,
+                          0);
+
     if(serverSocket < 0){
-        perror("socket creation failed.\n");
+        perror("socket creation failed");
         exit(1);
     }
 
-    //configure the server
+    // configure server
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(PORT);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
-    
-    // S-B-L-A
-    //bind the socket with port
-    if(bind(serverSocket,
-        (struct sockaddr*)&serverAddress,
-        sizeof(serverAddress))<0){
-            perror("bind failed.\n");
-            exit(1);
-        }
-    if(listen(serverSocket,5)<0){
-        perror("listen failed.\n");
+
+    // bind socket with port
+    if(bind(serverSocket ,
+        (struct sockaddr*)&serverAddress ,
+        sizeof(serverAddress)) < 0){
+
+        perror("bind failed");
         exit(1);
     }
-    printf("Waiting for incoming connection.\n");
 
-    //accept incoming connection
-    clientSocket = accept(serverSocket,
-                    (struct sockaddr*)&clientAddress,
-                    &clientLength);
-    printf("Client connected.");
+    // listen for client
+    if(listen(serverSocket , 5) < 0){
 
-    recv(clientSocket,
-        filename,
-        sizeof(filename),
-        0);
-    printf("client requested file : %s",filename);
-    filepointer = fopen(filename,"r");
+        perror("listen failed");
+        exit(1);
+    }
 
-    if (filepointer == NULL){
-        strcpy(buffer, 
-            "File not found!\n");
-        
-        send(clientSocket,
-            buffer,
-            strlen(buffer),
-            0);
-    }else {
-        while((readBytes=fread(buffer,
-                            1,
-                            sizeof(buffer),
-                            filepointer))>0){
-                        send(clientSocket,
-                            buffer,
-                            readBytes,
-                            0);
-                        }
+    printf("waiting for incoming connection...\n");
+
+    // accept client connection
+    clientSocket = accept(serverSocket ,
+                        (struct sockaddr*)&clientAddress ,
+                        &clientLength);
+
+    printf("client connected.\n");
+
+    // receive filename
+    int bytesReceived =
+        recv(clientSocket ,
+             filename ,
+             sizeof(filename) ,
+             0);
+
+    filename[bytesReceived] = '\0';
+
+    printf("client requested file : %s\n",
+            filename);
+
+    // open file
+    filepointer = fopen(filename , "r");
+
+    // file not found
+    if(filepointer == NULL){
+
+        strcpy(buffer ,
+                "File not found!\n");
+
+        send(clientSocket ,
+             buffer ,
+             strlen(buffer) ,
+             0);
+
+        printf("[error] file not found.\n");
+    }
+
+    // send file content
+    else{
+
+        while((readBytes =
+                fread(buffer ,
+                      1 ,
+                      sizeof(buffer) ,
+                      filepointer)) > 0){
+
+            send(clientSocket ,
+                 buffer ,
+                 readBytes ,
+                 0);
+        }
+
+        printf("[success] file transfer completed.\n");
+
         fclose(filepointer);
     }
+
+    // close sockets
     close(clientSocket);
     close(serverSocket);
+
     return 0;
 }
