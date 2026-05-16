@@ -10,6 +10,7 @@ int main(){
     int clientSocket;
     struct sockaddr_in serverAddress;
     char filename[SIZE];
+    char buffer[SIZE];
     int readBytes ;
 
     //socket creation 

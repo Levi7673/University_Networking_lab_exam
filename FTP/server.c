@@ -6,10 +6,13 @@
 
 #define PORT 8080
 #define SIZE 1024
+
 int main(){
     int clientSocket,serverSocket;
     struct sockaddr_in serverAddress , clientSocket;
     socklen_t clientLength = sizeof(clientAddress);
+    char filename[SIZE];
+    char buffer[SIZE];
       
     //socket creation 
     serverSocket = socket(AF_INET , SOCK_STREAM , 0 );
@@ -59,7 +62,15 @@ int main(){
             strlen(buffer),
             0)
     }else {
-        while(readBytes=)
+        while(readBytes=fread(buffer,
+                            1,
+                            sizeof(buffer),
+                            filepointer)>0){
+                        send(clientSocket,
+                            buffer,
+                            readBytes,
+                            0);
+                        }
         close(filepointer)
     }
     return 0;
