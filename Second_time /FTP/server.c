@@ -19,7 +19,7 @@ int main(){
     socklen_t clientLength = sizeof(clientAddress);
     //s-b-l-a
     //socket creation 
-    clientSocket = socket(AF_INET,SOCK_STREAM,0);
+    serverSocket = socket(AF_INET,SOCK_STREAM,0);
 
     //server configuration
     serverAddress.sin_family=AF_INET;
@@ -29,23 +29,23 @@ int main(){
     if(bind(serverSocket,
             (struct sockaddr*)&serverAddress,
             sizeof(serverAddress))<0){
-        perror("connection failed");
+        perror("bind failed");
         exit(1);
     }
     if(listen(serverSocket,5)<0){
-        perror("connection failed");
+        perror("listen failed");
         exit(1);
     }
 
     clientSocket = accept(serverSocket,
-                        (struct sockaddr*)&serverAddress,
+                        (struct sockaddr*)&clientAddress,
                         &clientLength);
-
-    recv(clientSocket,  
+    int receivedBytes = recv(clientSocket,  
         filename,
         sizeof(filename),
         0);
-    printf("Requested file : %s",filename);
+    filename[receivedBytes] = '\0';
+    printf("Requested file : %s\n",filename);
     
     
     fp = fopen (filename,"r");
@@ -53,18 +53,20 @@ int main(){
         strcpy(buffer,"File not found.\n");
         send(clientSocket,
             buffer,
-            strlen(buffer),
+            strlen(buffer)+1,
             0);
         printf("[EXIT] : file not found.\n");
     }else{
         while((readBytes = fread(buffer,1,sizeof(buffer),fp))>0){
             send(clientSocket,
                 buffer,
-                strlen(buffer),
+                readBytes,
                 0);
         }
+         printf("\tFILE READ COMPLETE.\t\n");
+         fclose(fp);
     }
-    printf("\tFILE READ COMPLETE.\t\n");
+   
     close(clientSocket);
     close(serverSocket);
 }

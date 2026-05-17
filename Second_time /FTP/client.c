@@ -33,7 +33,7 @@ int main(){
 
     send(clientSocket,
         filename,
-        strlen(filename),
+        strlen(filename)+1,
         0);
     printf("=========FILE CONTENT=========\n");
     while((readBytes = read (clientSocket , buffer,sizeof(buffer)))>0){
