@@ -2,7 +2,7 @@
 #include<string.h>
 #include<stdlib.h>
 #include<arpa/inet.h>
-#include<sys/time.h>
+#include<time.h>
 #include<unistd.h>
 
 #define PORT 8080
@@ -10,51 +10,103 @@
 #define ACK_PROB 70
 
 int main(){
-    socklen_t clientLength = sizeof(clientAddress);
-    //S_B_L_A
-    //socket creation  
-    serverSocket = socket(AF_INET,SOCK_STREAM,0);
 
-    // configure the socket 
+    int serverSocket , clientSocket;
+
+    struct sockaddr_in serverAddress ,
+                        clientAddress;
+
+    socklen_t clientLength =
+                sizeof(clientAddress);
+
+    char receivedBuffer[SIZE];
+
+    int receivedPacket;
+
+    // socket creation
+    serverSocket =
+        socket(AF_INET,SOCK_STREAM,0);
+
+    // configure socket
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(PORT);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
-    //set random seed 
+    // random seed
     srand(time(0));
 
+    // bind
     if(bind(serverSocket,
         (struct sockaddr*)&serverAddress,
-        sizeof(serverAddress))<0){
-        perror("Bind failed.");
-        exit(1);
-    }
-    if(listen(serverSocket,5)<0){
-        perror("listen failed.");
+        sizeof(serverAddress)) < 0){
+
+        perror("bind failed");
         exit(1);
     }
 
+    // listen
+    if(listen(serverSocket,5) < 0){
+
+        perror("listen failed");
+        exit(1);
+    }
+
+    // accept connection
     clientSocket = accept(serverSocket,
                     (struct sockaddr*)&clientAddress,
                     &clientLength);
+
+    printf("\n===========GO BACK N RECEIVER===========\n");
+    printf("[connected] : sender connected.\n");
+
     while(1){
-        int readBytes = read(clientSocket , receivedBuffer , sizeof(receivedBuffer));
-        if(readBytes < 0){
+
+        memset(receivedBuffer,0,SIZE);
+
+        int readBytes =
+            read(clientSocket,
+                receivedBuffer,
+                SIZE);
+
+        // sender finished
+        if(readBytes <= 0){
+
             printf("[EXIT] : transmission complete.\n");
-        receivedpacket = atoi(receivedBuffer);
-        printf("[RECEIVE] : received packet %s",receivedpacket);
+            break;
+        }
+
+        receivedPacket =
+            atoi(receivedBuffer);
+
+        printf("[RECEIVE] : packet %d received\n",
+                receivedPacket);
+
+        // ACK loss simulation
         if(rand()%100 < ACK_PROB){
-            printf("[ACK] : ack lost for packet %s .\n",receivedpacket);
-        }else{
-            sprintf(receivedBuffer , "%s" , receivedpacket);
+
+            printf("[ACK LOST] : ACK lost for packet %d\n",
+                    receivedPacket);
+        }
+
+        // send ACK
+        else{
+
+            sprintf(receivedBuffer,
+                    "%d",
+                    receivedPacket);
+
             send(clientSocket,
                 receivedBuffer,
-                sizeof(receivedBuffer),
+                strlen(receivedBuffer)+1,
                 0);
-            printf("[ACK] : ack send for the packet %s",receivedBuffer);
+
+            printf("[ACK] : ACK sent for packet %d\n",
+                    receivedPacket);
         }
     }
+
     close(clientSocket);
     close(serverSocket);
+
     return 0;
 }
