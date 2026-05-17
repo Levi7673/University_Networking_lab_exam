@@ -38,10 +38,20 @@ int main(){
                     (struct sockaddr*)&clientAddress,
                     &clientLength);
     while(1){
-        if(){
-
-        }esle{
-
+        int readBytes = read(clientSocket , receivedBuffer , sizeof(receivedBuffer));
+        if(readBytes < 0){
+            printf("[EXIT] : transmission complete.\n");
+        receivedpacket = atoi(receivedBuffer);
+        printf("[RECEIVE] : received packet %s",receivedpacket);
+        if(rand()%100 < ACK_PROB){
+            printf("[ACK] : ack lost for packet %s .\n",receivedpacket);
+        }else{
+            sprintf(receivedBuffer , "%s" , receivedpacket);
+            send(clientSocket,
+                receivedBuffer,
+                sizeof(receivedBuffer),
+                0);
+            printf("[ACK] : ack send for the packet %s",receivedBuffer);
         }
     }
     close(clientSocket);

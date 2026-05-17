@@ -16,6 +16,7 @@ int main(){
     char receivedBuffer[SIZE];
 
     int windowsize;
+    int ackpacket;
     int totalpacket;
     int basepacket = 1;
     int nextpacket = 1;
@@ -63,15 +64,17 @@ int main(){
             int readBytes=read(clientSocket,
                             receivedBuffer,
                             sizeof(receivedBuffer));
-            int 
-            printf()
             nextpacket ++;
         }
-        if(readBytes > 0){
 
+        if(readBytes > 0){
+            ackpacket = atoi(receivedBuffer);
+            printf("[ACK] : ack recieved for the packet %d.\n",ackpacket)
+            nextpacket = ackpacket + 1;
         }else{
+            printf("[timeout] : ACK not received\n");
             printf("[RETRANSMIT] : retransmitting the packet.\n")
-            nextpacket = basepacket
+            nextpacket = basepacket;
         }
     }
     close(clientSocket);
