@@ -53,7 +53,7 @@ int main(){
             printf("[EXIT] : conection closing.\n");
             break;
         }
-        printf("[PACKET RECECIVED] : received packet is %s",buffer)
+        printf("[PACKET RECECIVED] : received packet is %s\n",buffer);
         if(rand()%100 < ACK_PROB ){
             send(clientSocket,
                 "ACK",

@@ -3,7 +3,7 @@
 #include<unistd.h>
 #include<arpa/inet.h>
 #include<string.h>
-#include<time.h>
+#include<sys/time.h>
 #include<stdlib.h>
 
 #define PORT 8080
@@ -14,8 +14,8 @@ int main(){
     int clientSocket;
     struct timeval receivedTimeout;
     struct sockaddr_in serverAddress;
-    packetToSend[SIZE];
-    packetReceived[SIZE];
+    char packetToSend[SIZE];
+    char packetReceived[SIZE];
 
     //socket creatiom
     clientSocket = socket(AF_INET,SOCK_STREAM,0);
@@ -26,15 +26,15 @@ int main(){
     serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     //configure timeval
-    receivedTimeout.tc_sec = TIMEOUT_SECOND;
-    receivedTimeout.usec = 0;
+    receivedTimeout.tv_sec = TIMEOUT_SECOND;
+    receivedTimeout.tv_usec = 0;
 
     //set socket option 
     setsockopt(clientSocket,
             SOL_SOCKET,
             SO_RCVTIMEO,
-            sizeof(receivedTimeout),
-            &receivedTimeout);
+            &receivedTimeout,
+            sizeof(receivedTimeout));
     
     if(connect(clientSocket,
             (struct sockaddr*)&serverAddress,
@@ -45,9 +45,9 @@ int main(){
     
     while(1){
         printf("Enter packet number to send /'exit' : ");
-        scanf("%d",packetToSend);
+        scanf("%s",packetToSend);
 
-        if(strcmp(packetTosend,"exit")==0){
+        if(strcmp(packetToSend,"exit")==0){
             send(clientSocket,
                 packetToSend,
                 strlen(packetToSend),
@@ -67,8 +67,8 @@ int main(){
                                     packetReceived,
                                     sizeof(packetReceived));
             if(bytedRecevied < 0){
-                printf("[TIMEOUT] : ack not received.\n")
-                printf("[RETRANSMIT] : retransmitting the packet %d.\n",packetToSend);
+                printf("[TIMEOUT] : ack not received.\n");
+                printf("[RETRANSMIT] : retransmitting the packet %s.\n",packetToSend);
                 continue;
             }
             packetReceived[bytedRecevied]='\0';
