@@ -14,19 +14,19 @@ int main(){
     struct sockaddr_in serverAddress;
     struct sockaddr_in clientAddress;
     socklen_t clientLength =  sizeof(clientAddress);
-
-    char receviedBuffer[SIZE];
+    char receivedBuffer[SIZE];
     char buffer[SIZE];
-    int receviedPacket;
+    int receivedPacket;
     int readBytes;
-
+    
     // socket creation
     serverSocket = socket(AF_INET,SOCK_STREAM,0);
     // configure serveraddress
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(PORT);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
-
+    
+    srand(time(0));
     //bind
     if(bind(
         serverSocket,
@@ -37,17 +37,15 @@ int main(){
         exit(1);
     }
       //liesten
-    if(liesten(
-        serverSocket,
-        (struct sockaddr*)&serverAddress,
-        sizeof(serverAddress)
+    if(listen(
+        serverSocket,5
     )<0){
-        perror("liesten failed");
+        perror("listen failed");
         exit(1);
     }
 
     clientSocket = accept(
-        clientSocket,
+        serverSocket,
         (struct sockaddr*)&clientAddress,
         &clientLength
     );
@@ -79,7 +77,7 @@ int main(){
             printf("[ACK] : ack not sent for the packet %d\n",receivedPacket);
         }
     }
-    close(serverSocket);
     close(clientSocket);
+    close(serverSocket);
     return 0;
 }

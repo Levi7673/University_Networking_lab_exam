@@ -10,20 +10,22 @@
 #define TIMEOUT_SECOND 3
 int main(){
     //client
+    struct sockaddr_in serverAddress;
     int clientSocket;
-    char receviedBuffer[SIZE];
-    int receviedPacket;
+    char receivedBuffer[SIZE];
+    int receivedPacket;
+    char buffer[SIZE];
     int readBytes;
     // socket creation
     clientSocket = socket(AF_INET,SOCK_STREAM,0);
     // configure serveraddress
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(PORT);
-    serverAddress.sin_addr.s_addr = inet_Addr("127.0.0.1");
+    serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
     // configure timeval
     struct timeval receivedTimeout;
-    timeval.tv_sec = TIMEOUT_SECOND;
-    timeval.tv_usec = 0;
+    receivedTimeout.tv_sec = TIMEOUT_SECOND;
+    receivedTimeout.tv_usec = 0;
     // set socket option
     setsockopt(
         clientSocket,
@@ -42,14 +44,15 @@ int main(){
         exit(1);
     }
     // prompt user to enter the window size and totalpacket
+    int windowSize,totalPacket;
     printf("Enter the window size : ");
-    scanf("%d",windowSize);
+    scanf("%d",&windowSize);
     printf("Enter the totapackets : ");
-    scanf("%d",totalPacket);
+    scanf("%d",&totalPacket);
 
     int basePacket = 1 ;
     int nextPacket = 1;
-    while(basepacket <= nextPacket){
+    while(basePacket <= totalPacket){
         while(nextPacket < windowSize+basePacket && nextPacket <= totalPacket){
             sprintf(buffer,"%d",nextPacket);
             send(
@@ -58,22 +61,22 @@ int main(){
                 strlen(buffer)+1,
                 0
             );
-            printf("[SENT] : send packet %d",nextPacket);
+            printf("[SENT] : send packet %d\n",nextPacket);
             nextPacket++;
         }
-        memset ( receivedBuffer , 0 , SIZE)
+        memset ( receivedBuffer , 0 , SIZE);
         readBytes = read(
             clientSocket,
             receivedBuffer,
             sizeof(receivedBuffer)
         );
         if(readBytes <= 0){
-            printf("[TIMEOUT] : ack not received.\n[RETRANSMIT] : retransmit packets from %d",basePacket);
+            printf("[TIMEOUT] : ack not received.\n[RETRANSMIT] : retransmit packets from %d\n",basePacket);
             nextPacket = basePacket;
         }else{
-            ackPacket = atoi(receivedBuffer);
-            printf("[ACK] : ack received for the packet %d\n",receivedPacket);
-            nextPacket = ackPacket + 1;
+            int ackPacket = atoi(receivedBuffer);
+            printf("[ACK] : ack received for the packet %d\n",ackPacket);
+            basePacket = ackPacket + 1;
         }
     }
     printf("\tpacket sent successfully!\t\n");
