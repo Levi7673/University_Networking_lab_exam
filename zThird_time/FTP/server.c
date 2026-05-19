@@ -30,7 +30,7 @@ int main(){
     }
 
     clientSocket = accept(serverSocket , (struct sockaddr*)&clientAddress,&clientLength);
-    int readBytes = recv(clientSocket , filename , sizeof(filename),0);
+    int readBytes = read(clientSocket , filename , sizeof(filename));
     filename[readBytes] = '\0';
     printf("Requested file : %s\n",filename);
     fp = fopen(filename,"r");
